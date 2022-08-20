@@ -1,6 +1,3 @@
-import os
-from math import pi
-
 import numpy as np
 import torch
 
@@ -37,7 +34,7 @@ class Parity(object):
         self.ref_t = self.tmax * torch.ones((self.nx, 1)).to(self.device)
 
         # bc
-        self.f_l = 0.0
+        self.f_l = 1.0
         self.f_r = 0.0
 
         # ic
@@ -116,8 +113,7 @@ class Parity(object):
         """trick:
             <v j_x> = <vj>_x
         """
-        avg_1 = self.average_op(model=net_j, t_x=[t, x], vwquads=[self.vquads, self.wquads*self.vquads])
-        avg_2 = self.average_op(model=net_r, t_x=[t, x], vwquads=[self.vquads, self.wquads])
+        avg_1, avg_2 = self.average_op(net_r=net_r, net_j=net_j, t_x=[t, x], vwquads=[self.vquads, self.wquads])
         
         davg_dx = torch.autograd.grad(outputs=avg_1, inputs=x,
                                       grad_outputs=torch.ones(
@@ -129,13 +125,29 @@ class Parity(object):
 
         return values, derivatives
 
-    def average_op(self, model, t_x, vwquads):
+    """remark
+        other choice for construct average_op by design r and j in the network, then 
+        one may have 
+                avg_1 = self.average_op(..., vwquads=[self.vquads, self.wquads*self.vquads])
+                avg_2 = self.average_op(..., vwquads=[self.vquads, self.wquads])
+    """
+    def average_op(self, net_r, net_j, t_x, vwquads):
         tx = torch.cat(t_x, -1)[:, None, :]
-        v, w = vwquads
+        v, w1 = vwquads
+        w2 = w1 * v
         mult_fact = torch.ones((tx.shape[0], v.shape[0], 1)).to(self.device)
-        fn = model(torch.cat([tx * mult_fact, v[..., None] * mult_fact], -1))
-        average_fn = torch.sum(fn * w[..., None], axis=-2)
-        return average_fn
+
+        j_1 = net_j(torch.cat([tx * mult_fact, v[..., None] * mult_fact], -1))
+        j_2 = net_j(torch.cat([tx * mult_fact, - v[..., None] * mult_fact], -1))
+        gn = j_1 - j_2
+        avg_1 = torch.sum(gn * w2[..., None], axis=-2)
+
+        r_1 = net_r(torch.cat([tx * mult_fact, v[..., None] * mult_fact], -1))
+        r_2 = net_r(torch.cat([tx * mult_fact, - v[..., None] * mult_fact], -1))
+        fn = torch.exp(-0.5*(r_1 + r_2))
+        avg_2 = torch.sum(fn * w1[..., None], axis=-2)
+        
+        return avg_1, avg_2
 
 
     # inputs = (tbc, vbc_l, vbc_r)

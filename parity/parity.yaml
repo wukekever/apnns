@@ -9,8 +9,8 @@ physical_config:
 
 # Dataset parameters
 dataset_config:
-  interior_samples: 1024
-  boundary_samples: 256
+  interior_samples: 512
+  boundary_samples: 1024
   initial_samples: 512
 
 # Model parameters
@@ -19,13 +19,13 @@ model_config:
   lr: 0.001
   stage_num: 1000
   decay_rate: 0.96
-  iterations: 100000 
+  iterations: 10000 
   neural_network_type: "FCNet" # type 1 - "ResNet"; type 2 - "FCNet"  
-  units_rho: [128, 128, 128, 128, 128, 128]
-  units_r: [256, 256, 256, 256, 256, 256]
-  units_j: [256, 256, 256, 256, 256, 256]
+  units_rho: [128, 128, 128, 128]
+  units_r: [256, 256, 256, 256]
+  units_j: [256, 256, 256, 256]
   kn: 0.001
   num_vquads: 30
-  regularizers: [1.0, 1.0, 1.0, 10.0, 1.0, 10.0, 1.0] 
+  regularizers: [1.0, 1.0, 1.0, 1.0, 10.0, 1.0, 10.0] # parity * 2, claw, constraint, boundary, initial(rho, f) 
 
   
