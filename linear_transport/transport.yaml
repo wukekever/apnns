@@ -1,0 +1,29 @@
+# Physical parameters
+physical_config:
+  time_dimension: 1
+  space_dimension: 1
+  velocity_dimension: 1
+  t_range: [0.0, 1.0]
+  x_range: [0.0, 1.0]
+  v_range: [-1.0, 1.0] 
+
+# Dataset parameters
+dataset_config:
+  interior_samples: 1024
+  boundary_samples: 256
+  initial_samples: 512
+
+# Model parameters
+model_config:
+  device_ids: [0]
+  lr: 0.001
+  stage_num: 500
+  decay_rate: 0.96
+  iterations: 10000  
+  neural_network_type: "FCNet" # type 1 - "ResNet"; type 2 - "FCNet"  
+  units_f: [256, 256, 256, 256]
+  kn: 1.0
+  num_vquads: 30
+  regularizers: [1.0, 1.0, 10.0] 
+
+  
