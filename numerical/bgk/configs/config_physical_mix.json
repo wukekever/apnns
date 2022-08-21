@@ -1,0 +1,16 @@
+{
+  "domain_config": {
+    "nt": 100,
+    "tmax": 0.1,
+    "dt_unit": 8e-4,
+    "_dt_comment": "the maximum step size allowed to use, no need to change so far",
+    "nx": 100,
+    "nv": 60,
+    "xmin": -0.5,
+    "xmax": 0.5,
+    "vmin": -10,
+    "vmax": 10,
+    "BC_type": "periodic",
+    "stepper": "IMEX"
+  }
+}
