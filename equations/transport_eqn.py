@@ -16,17 +16,21 @@ class LinearTransport(object):
         # Knudsen number
         self.kn = config["model_config"]["kn"]
 
-        # quadrature points and weights
-        self.num_vquads = config["model_config"]["num_vquads"]
-        vquads, wquads = np.polynomial.legendre.leggauss(self.num_vquads)
-        self.vquads = torch.Tensor(0.5 * (1.0 + vquads)).to(self.device)
-        self.wquads = torch.Tensor(0.5 * wquads).to(self.device)
-
         # domain
         self.tmin = config["physical_config"]["t_range"][0]
         self.tmax = config["physical_config"]["t_range"][1]
         self.xmin = config["physical_config"]["x_range"][0]
         self.xmax = config["physical_config"]["x_range"][1]
+        self.vmin = config["physical_config"]["v_range"][0]
+        self.vmax = config["physical_config"]["v_range"][1]
+
+        # quadrature points and weights
+        self.num_vquads = config["dataset_config"]["num_vquads"]
+        vquads, wquads = np.polynomial.legendre.leggauss(self.num_vquads)
+        vquads = 0.5 * (vquads + 1.0) * (self.vmax - self.vmin) + self.vmin
+        wquads = 0.5 * (self.vmax - self.vmin) * wquads
+        self.vquads = torch.Tensor(vquads).to(self.device)
+        self.wquads = torch.Tensor(wquads).to(self.device)
 
         # ref
         self.nx = 100
