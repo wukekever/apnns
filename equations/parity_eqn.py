@@ -12,7 +12,7 @@ class Parity(object):
         )
 
         # Knudsen number
-        self.kn = config["model_config"]["kn"]
+        self.kn = config["physical_config"]["kn"]
 
         # domain
         self.tmin = config["physical_config"]["t_range"][0]
@@ -23,7 +23,7 @@ class Parity(object):
         self.vmax = config["physical_config"]["v_range"][1]
 
         # quadrature points and weights
-        self.num_vquads = config["dataset_config"]["num_vquads"]
+        self.num_vquads = config["model_config"]["num_vquads"]
         vquads, wquads = np.polynomial.legendre.leggauss(self.num_vquads)
         vquads = 0.5 * (vquads + 1.0) * (self.vmax - self.vmin) + self.vmin
         wquads = 0.5 * (self.vmax - self.vmin) * wquads

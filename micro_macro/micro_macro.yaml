@@ -1,5 +1,6 @@
 # Physical parameters
 physical_config:
+  kn: 0.00000001
   time_dimension: 1
   space_dimension: 1
   velocity_dimension: 1
@@ -23,7 +24,6 @@ model_config:
   neural_network_type: "FCNet" # type 1 - "ResNet"; type 2 - "FCNet"  
   units_rho: [128, 128, 128, 128]
   units_g: [256, 256, 256, 256]
-  kn: 0.00000001
   num_vquads: 30
   regularizers: [1.0, 1.0, 10.0, 10.0] 
 

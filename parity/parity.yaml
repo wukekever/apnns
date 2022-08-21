@@ -1,5 +1,6 @@
 # Physical parameters
 physical_config:
+  kn: 0.001
   time_dimension: 1
   space_dimension: 1
   velocity_dimension: 1
@@ -24,7 +25,6 @@ model_config:
   units_rho: [128, 128, 128, 128]
   units_r: [256, 256, 256, 256]
   units_j: [256, 256, 256, 256]
-  kn: 0.001
   num_vquads: 30
   regularizers: [1.0, 1.0, 1.0, 1.0, 10.0, 1.0, 10.0] # parity * 2, claw, constraint, boundary, initial(rho, f) 
 
