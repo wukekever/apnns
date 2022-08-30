@@ -1,6 +1,7 @@
-import torch
-import numpy as np
 from math import pi
+
+import numpy as np
+import torch
 
 
 class BGK(object):
@@ -55,9 +56,9 @@ class BGK(object):
         f = values["f"]
         Maxwellian = values["maxwellian"]
         density, momentum, energy = values["var_flow"]
-        avg_fv0, avg_fv1, avg_fv2 = values["average"]
+        avg_fv0, avg_fv1, avg_fv2 = values["var_moment"]
         df_dt, df_dx = derivatives["f"]
-        drho_dt, dm_dt, dE_dt = derivatives["var_macro"]
+        drho_dt, dm_dt, dE_dt = derivatives["var_flow"]
         df1_dx, df2_dx, df3_dx = derivatives["var_moment"]
 
         eqn_res = {}
@@ -109,7 +110,7 @@ class BGK(object):
         avg_fv3 = self.average_op(
             model_f, [t, x], [self.vquads, self.wquads * self.vquads ** 3]
         )
-        values.update({"average": (avg_fv0, avg_fv1, avg_fv2)})
+        values.update({"var_moment": (avg_fv0, avg_fv1, avg_fv2)})
 
         Maxwellian = self.maxwellian(density, velocity, temperature, v)
         values.update({"maxwellian": Maxwellian})
@@ -147,7 +148,7 @@ class BGK(object):
             grad_outputs=torch.ones(energy.shape).to(self.device),
             create_graph=True,
         )[0]
-        derivatives.update({"var_macro": (drho_dt, dm_dt, dE_dt)})
+        derivatives.update({"var_flow": (drho_dt, dm_dt, dE_dt)})
 
         df1_dx = torch.autograd.grad(
             outputs=avg_fv1,

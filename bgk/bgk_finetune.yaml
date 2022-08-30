@@ -18,15 +18,15 @@ dataset_config:
 model_config:
   device_ids: [0]
   lr: 0.00001
-  stage_num: 1
-  decay_rate: 1.0
-  iterations: 1
+  stage_num: 10
+  decay_rate: 0.96
+  iterations: 1000
   neural_network_type: "ResNet" # 1. ResNet; 2. FCNet
   units_f: [128, 128, 128, 128, 128, 128] # ResNet: must be even and length > 4
   units_rho: [64, 64, 64, 64, 64, 64] 
   units_u: [64, 64, 64, 64, 64, 64]  
   units_T: [64, 64, 64, 64, 64, 64] 
   num_vquads: 64
-  regularizers: [1.0, 1.0, 1.0, 1.0, 11.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] # weights: [bgk_eqn, conservation * 3, relaxation * 3, bc * 3, ic * 4] 
- 
+  regularizers: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.1, 1.0, 10.0, 1.0, 10.0, 10.0] # weights: [bgk_eqn, conservation * 3, relaxation * 3, bc * 3, ic * 4] 
+
   

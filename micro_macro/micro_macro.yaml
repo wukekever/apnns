@@ -21,9 +21,12 @@ model_config:
   stage_num: 500
   decay_rate: 0.96
   iterations: 10000  
-  neural_network_type: "FCNet" # type 1 - "ResNet"; type 2 - "FCNet"  
-  units_rho: [128, 128, 128, 128]
-  units_g: [256, 256, 256, 256]
+  neural_network_type: "ResNet" # type 1 - "ResNet"; type 2 - "FCNet" 
+  units_rho: [128, 128, 128, 128, 128]
+  units_g: [256, 256, 256, 256, 256]
+  ## "FCNet" 
+  # units_rho: [128, 128, 128, 128] 
+  # units_g: [256, 256, 256, 256]  
   num_vquads: 30
   regularizers: [1.0, 1.0, 10.0, 10.0] 
 

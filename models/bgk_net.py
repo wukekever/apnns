@@ -1,13 +1,14 @@
+import os
+from math import log, pi
+
 import torch
 import torch.nn as nn
-import os
-from math import pi
-from math import log
+
 
 # 1. ResNet
 # Residual block
 class ResidualBlock(nn.Module):
-    def __init__(self, units, activation, name="residual_block", **kwargs):
+    def __init__(self, units, activation, **kwargs):
         super(ResidualBlock, self).__init__()
         self._units = units
         self._activation = activation
@@ -47,8 +48,8 @@ class Model_f_ResNet(nn.Module):
     def forward(self, inputs):
         t, x, v = torch.split(inputs, [1, 1, 1], dim=-1)
         # normalization
-        t = t / 0.1  
-        v = v / 10.0
+        # t = t / 0.1  
+        # v = v / 10.0
         output = torch.cat([t, x, v], dim=-1)
         for i in range(len(self._residual_blocks)):
             output = self._residual_blocks[i](output)
@@ -87,7 +88,7 @@ class Model_rho_ResNet(nn.Module):
 
     def forward(self, inputs):
         t, x = torch.split(inputs, [1, 1], dim=-1)
-        t = t / 0.1
+        # t = t / 0.1
         output = torch.cat([t, x], dim=-1)
         for i in range(len(self._residual_blocks)):
             output = self._residual_blocks[i](output)
@@ -134,7 +135,7 @@ class Model_u_ResNet(nn.Module):
 
     def forward(self, inputs):
         t, x = torch.split(inputs, [1, 1], dim=-1)
-        t = t / 0.1
+        # t = t / 0.1
         output = torch.cat([t, x], dim=-1)
         for i in range(len(self._residual_blocks)):
             output = self._residual_blocks[i](output)
@@ -145,9 +146,6 @@ class Model_u_ResNet(nn.Module):
     def activation(self, o):
         return o * torch.sigmoid(o)
         # return torch.tanh(o)
-
-    def positive(self, o):
-        return torch.exp(o)
 
     def bdy_l(self, o):
         return 0.5 - o
@@ -181,7 +179,7 @@ class Model_T_ResNet(nn.Module):
 
     def forward(self, inputs):
         t, x = torch.split(inputs, [1, 1], dim=-1)
-        t = t / 0.1
+        # t = t / 0.1
         output = torch.cat([t, x], dim=-1)
         for i in range(len(self._residual_blocks)):
             output = self._residual_blocks[i](output)
@@ -196,9 +194,6 @@ class Model_T_ResNet(nn.Module):
     def activation(self, o):
         return o * torch.sigmoid(o)
         # return torch.tanh(o)
-
-    def positive(self, o):
-        return torch.exp(o)
 
     def bdy_l(self, o):
         return 0.5 - o
