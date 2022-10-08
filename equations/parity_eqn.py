@@ -59,7 +59,7 @@ class Parity(object):
         davg_dx = derivatives["average"]
         avg_r = values["average"]
 
-        # residual for parity and conservation equation
+        # residual for parity and conservation equations
         eqn_res = {}
 
         res_parity_1 = self.kn ** 2 * (dr_dt + v * dj_dx) - (rho - r)
