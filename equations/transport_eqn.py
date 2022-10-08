@@ -10,7 +10,8 @@ class LinearTransport(object):
         # device setting
         device_ids = config["model_config"]["device_ids"]
         self.device = torch.device(
-            "cuda:{:d}".format(device_ids[0]) if torch.cuda.is_available() else "cpu"
+            "cuda:{:d}".format(
+                device_ids[0]) if torch.cuda.is_available() else "cpu"
         )
 
         # Knudsen number
@@ -102,7 +103,7 @@ class LinearTransport(object):
         v, w = vwquads
         mult_fact = torch.ones((tx.shape[0], v.shape[0], 1)).to(self.device)
         fn = model(torch.cat([tx * mult_fact, v[..., None] * mult_fact], -1))
-        average_f = torch.sum(fn * w[..., None], axis=-2) * 0.5
+        average_f = torch.sum(fn * w[..., None], dim=-2) * 0.5
         return average_f
 
     def rho(self, sol, inputs):
@@ -118,9 +119,11 @@ class LinearTransport(object):
         vbc_l, vbc_r = vbc, -vbc
         model_f = sol
         # Left
-        fbc_l = model_f(torch.cat((tbc, self.xmin * torch.ones_like(tbc), vbc_l), -1))
+        fbc_l = model_f(
+            torch.cat((tbc, self.xmin * torch.ones_like(tbc), vbc_l), -1))
         # Right
-        fbc_r = model_f(torch.cat((tbc, self.xmax * torch.ones_like(tbc), vbc_r), -1))
+        fbc_r = model_f(
+            torch.cat((tbc, self.xmax * torch.ones_like(tbc), vbc_r), -1))
 
         res_f_l = fbc_l - self.f_l
         res_f_r = fbc_r - self.f_r
@@ -135,7 +138,8 @@ class LinearTransport(object):
     def ic(self, sol, inputs):
         xic, vic = inputs
         model_f = sol
-        f0 = model_f(torch.cat((self.tmin * torch.ones_like(xic), xic, vic), -1))
+        f0 = model_f(
+            torch.cat((self.tmin * torch.ones_like(xic), xic, vic), -1))
         res_ic = {}
         res_init = f0 - self.f_init
 

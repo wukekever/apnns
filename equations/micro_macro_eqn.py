@@ -10,7 +10,8 @@ class MicroMacro(object):
         # device setting
         device_ids = config["model_config"]["device_ids"]
         self.device = torch.device(
-            "cuda:{:d}".format(device_ids[0]) if torch.cuda.is_available() else "cpu"
+            "cuda:{:d}".format(
+                device_ids[0]) if torch.cuda.is_available() else "cpu"
         )
 
         # Knudsen number
@@ -61,7 +62,8 @@ class MicroMacro(object):
            \Pi (v g_x) = <vg_x> = <vg>_x <-- which exactly occurs in the Macro part !
         """
         eqn_res = {}
-        micro_res = self.kn**2 * g_t + self.kn * (v * g_x - aver_vg_x) + v * rho_x - collision         
+        micro_res = self.kn**2 * g_t + self.kn * \
+            (v * g_x - aver_vg_x) + v * rho_x - collision
         macro_res = rho_t + aver_vg_x
         eqn_res.update({"micro": micro_res})
         eqn_res.update({"macro": macro_res})
@@ -73,33 +75,40 @@ class MicroMacro(object):
         x.requires_grad = True
 
         model_rho, model_g = sol
-        g = model_g(torch.cat([t, x, v], -1)) - self.average_op(model=model_g, t_x=[t, x], vwquads=[self.vquads, self.wquads])
+        g = model_g(torch.cat([t, x, v], -1)) - self.average_op(
+            model=model_g, t_x=[t, x], vwquads=[self.vquads, self.wquads])
         rho = model_rho(torch.cat([t, x], -1))
 
         # Micro part
-        g_t = torch.autograd.grad(outputs = g, inputs = t, 
-                                  grad_outputs = torch.ones(g.shape).to(self.device), 
-                                  create_graph = True)[0]
-        
-        g_x = torch.autograd.grad(outputs = g, inputs = x, 
-                                  grad_outputs = torch.ones(g.shape).to(self.device), 
-                                  create_graph = True)[0]
-        
-        rho_x = torch.autograd.grad(outputs = rho, inputs = x, 
-                                    grad_outputs = torch.ones(rho.shape).to(self.device), 
-                                    create_graph = True)[0]          
+        g_t = torch.autograd.grad(outputs=g, inputs=t,
+                                  grad_outputs=torch.ones(
+                                      g.shape).to(self.device),
+                                  create_graph=True)[0]
+
+        g_x = torch.autograd.grad(outputs=g, inputs=x,
+                                  grad_outputs=torch.ones(
+                                      g.shape).to(self.device),
+                                  create_graph=True)[0]
+
+        rho_x = torch.autograd.grad(outputs=rho, inputs=x,
+                                    grad_outputs=torch.ones(
+                                        rho.shape).to(self.device),
+                                    create_graph=True)[0]
 
         # Macro part
-        aver_vg = self.average_op(model=model_g, t_x=[t, x], vwquads=[self.vquads, self.wquads*self.vquads])       
-        
-        aver_vg_x = torch.autograd.grad(outputs = aver_vg, inputs = x, 
-                                       grad_outputs = torch.ones(aver_vg.shape).to(self.device), 
-                                       create_graph = True)[0]
-        
-        rho_t = torch.autograd.grad(outputs = rho, inputs = t, 
-                                    grad_outputs = torch.ones(rho.shape).to(self.device), 
-                                    create_graph = True)[0]
-        
+        aver_vg = self.average_op(model=model_g, t_x=[t, x], vwquads=[
+                                  self.vquads, self.wquads*self.vquads])
+
+        aver_vg_x = torch.autograd.grad(outputs=aver_vg, inputs=x,
+                                        grad_outputs=torch.ones(
+                                            aver_vg.shape).to(self.device),
+                                        create_graph=True)[0]
+
+        rho_t = torch.autograd.grad(outputs=rho, inputs=t,
+                                    grad_outputs=torch.ones(
+                                        rho.shape).to(self.device),
+                                    create_graph=True)[0]
+
         # Collision term
         """Property
            g = g_bar - <g_bar>
@@ -121,7 +130,7 @@ class MicroMacro(object):
         v, w = vwquads
         mult_fact = torch.ones((tx.shape[0], v.shape[0], 1)).to(self.device)
         fn = model(torch.cat([tx * mult_fact, v[..., None] * mult_fact], -1))
-        average_fn = 0.5 * torch.sum(fn * w[..., None], axis=-2)
+        average_fn = 0.5 * torch.sum(fn * w[..., None], dim=-2)
         return average_fn
 
     def rho(self, sol, inputs):
@@ -129,11 +138,12 @@ class MicroMacro(object):
         model_rho = sol[0]
         rho_approx = model_rho(torch.cat([t, x], -1))
         return rho_approx
-    
+
     def model_f(self, sol, inputs):
         t, x, v = inputs
         model_rho, model_g = sol
-        g = model_g(torch.cat([t, x, v], -1)) - self.average_op(model=model_g, t_x=[t, x], vwquads=[self.vquads, self.wquads])
+        g = model_g(torch.cat([t, x, v], -1)) - self.average_op(
+            model=model_g, t_x=[t, x], vwquads=[self.vquads, self.wquads])
         rho = model_rho(torch.cat([t, x], -1))
         f_approx = rho + self.kn * g
         return f_approx
@@ -143,9 +153,11 @@ class MicroMacro(object):
         tbc, vbc = inputs
         vbc_l, vbc_r = vbc, -vbc
         # Left
-        fbc_l = self.model_f(sol=sol, inputs=[tbc, self.xmin * torch.ones_like(tbc), vbc_l])
+        fbc_l = self.model_f(
+            sol=sol, inputs=[tbc, self.xmin * torch.ones_like(tbc), vbc_l])
         # Right
-        fbc_r = self.model_f(sol=sol, inputs=[tbc, self.xmax * torch.ones_like(tbc), vbc_r])
+        fbc_r = self.model_f(
+            sol=sol, inputs=[tbc, self.xmax * torch.ones_like(tbc), vbc_r])
 
         res_f_l = fbc_l - self.f_l
         res_f_r = fbc_r - self.f_r
@@ -159,7 +171,8 @@ class MicroMacro(object):
     # inputs = (xic, vic)
     def ic(self, sol, inputs):
         xic, vic = inputs
-        f0 = self.model_f(sol=sol, inputs=[self.tmin * torch.ones_like(xic), xic, vic])
+        f0 = self.model_f(
+            sol=sol, inputs=[self.tmin * torch.ones_like(xic), xic, vic])
         res_ic = {}
         res_init = f0 - self.f_init
 

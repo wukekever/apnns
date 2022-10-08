@@ -8,7 +8,8 @@ class Parity(object):
         # device setting
         device_ids = config["model_config"]["device_ids"]
         self.device = torch.device(
-            "cuda:{:d}".format(device_ids[0]) if torch.cuda.is_available() else "cpu"
+            "cuda:{:d}".format(
+                device_ids[0]) if torch.cuda.is_available() else "cpu"
         )
 
         # Knudsen number
@@ -77,7 +78,7 @@ class Parity(object):
         t.requires_grad = True
         x.requires_grad = True
 
-        net_rho, net_r, net_j = sol       
+        net_rho, net_r, net_j = sol
         rho = self.model_rho(net_rho, [t, x])
         r = self.model_r(net_r, [t, x, v])
         j = self.model_j(net_j, [t, x, v])
@@ -109,7 +110,7 @@ class Parity(object):
                                       grad_outputs=torch.ones(
                                           rho.shape).to(self.device),
                                       create_graph=True)[0]
-    
+
         derivatives = {}
         derivatives.update({"rho": (drho_dt)})
         derivatives.update({"r": (dr_dt, dr_dx)})
@@ -117,8 +118,9 @@ class Parity(object):
         """trick:
             <v j_x> = <vj>_x
         """
-        avg_1, avg_2 = self.average_op(net_r=net_r, net_j=net_j, t_x=[t, x], vwquads=[self.vquads, self.wquads])
-        
+        avg_1, avg_2 = self.average_op(net_r=net_r, net_j=net_j, t_x=[
+                                       t, x], vwquads=[self.vquads, self.wquads])
+
         davg_dx = torch.autograd.grad(outputs=avg_1, inputs=x,
                                       grad_outputs=torch.ones(
                                           avg_1.shape).to(self.device),
@@ -135,6 +137,7 @@ class Parity(object):
                 avg_1 = self.average_op(..., vwquads=[self.vquads, self.wquads*self.vquads])
                 avg_2 = self.average_op(..., vwquads=[self.vquads, self.wquads])
     """
+
     def average_op(self, net_r, net_j, t_x, vwquads):
         tx = torch.cat(t_x, -1)[:, None, :]
         v, w1 = vwquads
@@ -142,27 +145,29 @@ class Parity(object):
         mult_fact = torch.ones((tx.shape[0], v.shape[0], 1)).to(self.device)
 
         j_1 = net_j(torch.cat([tx * mult_fact, v[..., None] * mult_fact], -1))
-        j_2 = net_j(torch.cat([tx * mult_fact, - v[..., None] * mult_fact], -1))
+        j_2 = net_j(
+            torch.cat([tx * mult_fact, - v[..., None] * mult_fact], -1))
         gn = j_1 - j_2
-        avg_1 = torch.sum(gn * w2[..., None], axis=-2)
+        avg_1 = torch.sum(gn * w2[..., None], dim=-2)
 
         r_1 = net_r(torch.cat([tx * mult_fact, v[..., None] * mult_fact], -1))
-        r_2 = net_r(torch.cat([tx * mult_fact, - v[..., None] * mult_fact], -1))
+        r_2 = net_r(
+            torch.cat([tx * mult_fact, - v[..., None] * mult_fact], -1))
         fn = torch.exp(-0.5*(r_1 + r_2))
-        avg_2 = torch.sum(fn * w1[..., None], axis=-2)
-        
+        avg_2 = torch.sum(fn * w1[..., None], dim=-2)
+
         return avg_1, avg_2
 
-
     # inputs = (tbc, vbc_l, vbc_r)
+
     def bc(self, net_r, net_j, inputs):
         tbc, vbc_l, vbc_r = inputs
         # Left
-        bc_l =  [tbc, self.xmin * torch.ones_like(tbc), vbc_l]
-        fbc_l = self.model_r(net_r, bc_l) +  self.kn * self.model_j(net_j, bc_l)
+        bc_l = [tbc, self.xmin * torch.ones_like(tbc), vbc_l]
+        fbc_l = self.model_r(net_r, bc_l) + self.kn * self.model_j(net_j, bc_l)
         # Right
         bc_r = [tbc, self.xmax * torch.ones_like(tbc), vbc_r]
-        fbc_r = self.model_r(net_r, bc_r) +  self.kn * self.model_j(net_j, bc_r)
+        fbc_r = self.model_r(net_r, bc_r) + self.kn * self.model_j(net_j, bc_r)
 
         res_f_l = fbc_l - self.f_l
         res_f_r = fbc_r - self.f_r
@@ -179,7 +184,7 @@ class Parity(object):
         rho0 = self.model_rho(net_rho, [0.0*xic, xic])
         init = [0.0*xic, xic, vic]
         f0 = self.model_r(net_r, init) + self.kn * self.model_j(net_j, init)
-        
+
         res_ic = {}
         res_rho_init = rho0 - self.rho_init
         res_f_init = f0 - self.f_init

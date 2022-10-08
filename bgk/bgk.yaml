@@ -16,11 +16,11 @@ dataset_config:
   
 # Model parameters
 model_config:
-  device_ids: [1]
-  lr: 0.005
-  stage_num: 100
+  device_ids: [0]
+  lr: 0.008
+  stage_num: 2500
   decay_rate: 0.96
-  iterations: 5000
+  iterations: 50000
   neural_network_type: "ResNet" # 1. ResNet; 2. FCNet
   units_f: [128, 128, 128, 128, 128, 128] # ResNet: must be even and length > 4
   units_rho: [64, 64, 64, 64, 64, 64] 

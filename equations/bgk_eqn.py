@@ -10,7 +10,8 @@ class BGK(object):
         # device setting
         device_ids = config["model_config"]["device_ids"]
         self.device = torch.device(
-            "cuda:{:d}".format(device_ids[0]) if torch.cuda.is_available() else "cpu"
+            "cuda:{:d}".format(
+                device_ids[0]) if torch.cuda.is_available() else "cpu"
         )
 
         # Knudsen number
@@ -40,7 +41,8 @@ class BGK(object):
         self.nx = 100
         self.dx = float(self.xmax - self.xmin) / self.nx
         self.ref_x = (
-            torch.arange(self.xmin + self.dx / 2, self.xmax + self.dx / 2, self.dx)
+            torch.arange(self.xmin + self.dx / 2,
+                         self.xmax + self.dx / 2, self.dx)
             .reshape((-1, 1))
             .to(self.device)
         )
@@ -177,7 +179,7 @@ class BGK(object):
         v, w = vwquads
         mult_fact = torch.ones((tx.shape[0], v.shape[0], 1)).to(self.device)
         fn = model(torch.cat([tx * mult_fact, v[..., None] * mult_fact], -1))
-        return torch.sum(fn * w[..., None], axis=-2)
+        return torch.sum(fn * w[..., None], dim=-2)
 
     # Maxwellian function
     def maxwellian(self, rho, u, T, v):
@@ -242,7 +244,8 @@ class BGK(object):
         res_T_init = _T_init - T0
         res_f_init = f_init - f0
 
-        res_ic.update({"initial": (res_rho_init, res_u_init, res_T_init, res_f_init)})
+        res_ic.update(
+            {"initial": (res_rho_init, res_u_init, res_T_init, res_f_init)})
 
         return res_ic
 
@@ -280,7 +283,8 @@ class BGK(object):
             torch.mean(torch.sqrt((momentum_ref - momentum_approx) ** 2))
         )
         err_energy = torch.sqrt(
-            torch.mean((energy_ref - energy_approx) ** 2) / torch.mean(energy_ref ** 2)
+            torch.mean((energy_ref - energy_approx) ** 2) /
+            torch.mean(energy_ref ** 2)
         )
 
         return err_density, err_momentum, err_energy
