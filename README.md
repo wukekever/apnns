@@ -1,4 +1,4 @@
-# Asymptotic-Preserving Neural Networks for Solving Multiscale Kinetic Equation
+# Asymptotic-Preserving Neural Networks for Solving Multiscale Kinetic Equations
 
 This repository contains the PyTorch code for the following papers
 
