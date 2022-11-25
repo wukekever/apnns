@@ -1,0 +1,31 @@
+# Physical parameters
+physical_config:
+  kn: 1.0
+  time_dimension: 1
+  space_dimension: 1
+  velocity_dimension: 1
+  t_range: [0.0, 0.1]
+  x_range: [-0.5, 0.5]
+  v_range: [-10.0, 10.0]
+
+# Dataset parameters
+dataset_config:
+  interior_samples: 512
+  initial_samples: 256
+  boundary_samples: 128
+  
+# Model parameters
+model_config:
+  device_ids: [0]
+  lr: 0.008
+  stage_num: 2500
+  decay_rate: 0.96
+  iterations: 50000
+  neural_network_type: "ResNet" # 1. ResNet; 2. FCNet
+  units_f: [128, 128, 128, 128, 128, 128] # ResNet: must be even and length > 4
+  units_rho: [64, 64, 64, 64, 64, 64] 
+  units_u: [64, 64, 64, 64, 64, 64]  
+  units_T: [64, 64, 64, 64, 64, 64] 
+  num_vquads: 64
+  regularizers: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.1, 1.0, 10.0, 1.0, 10.0, 10.0] # weights: [bgk_eqn, conservation * 3, relaxation * 3, bc * 3, ic * 4] 
+  
